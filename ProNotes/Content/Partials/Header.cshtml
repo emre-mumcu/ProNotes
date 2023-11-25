@@ -1,0 +1,105 @@
+﻿@using System.Security.Claims
+
+@if (_RazorTools.GetCurrentSession() != null && User != null && User.Identity != null &&  (User.Identity as ClaimsIdentity) != null)
+{
+    <header class='mb-3'>
+
+        <nav class="navbar navbar-expand navbar-light ">
+
+            <div class="container-fluid">
+
+                <a href="#" class="burger-btn d-block">
+                    <i class="bi bi-justify fs-3"></i>
+                </a>
+
+                <button class="navbar-toggler " type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="navbar-collapse pb-2">
+
+                    <ul class="navbar-nav">
+
+                        <li class="nav-item mx-2">
+                            <a class="nav-link active text-body bg-opacity-10 bg-gray rounded-2" aria-current="page" href="@Url.Content("~/")"><i class="fa-solid fa-house"></i> Home</a>
+                        </li>
+
+                        <li class="nav-item dropdown bg-opacity-10 bg-gray rounded-2">
+                            <partial name="~/Content/Partials/Themes.cshtml"></partial>
+                        </li>
+
+                        <!-- Light / Dark Mode -->
+                        <li class="nav-item mx-2">
+                            <div class="theme-toggle d-flex align-items-center mt-2">
+                                <div class="form-check form-switch fs-6">
+                                    <input class="form-check-input  me-0" type="checkbox" id="toggle-dark">
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+
+                </div>
+
+                <div class="collapse navbar-collapse">
+
+                    <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    </ul>
+
+                    <div class="dropdown">
+
+                        <a href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                            <div class="user-menu d-flex">
+                                <div class="user-name text-end me-3">
+                                    <h6 class="mb-0 text-gray-600">@(User?.Identity?.Name ?? "Anonymous")</h6>
+                                    <p class="mb-0 text-sm text-muted">@(_HttpContextAccessor?.HttpContext?.Session?.GetKey<string>(AppConstants.SessionKey_SelectedRole) ?? "Select a role")</p>
+                                </div>
+                                <div class="user-img d-flex align-items-center">
+                                    <div class="avatar avatar-md">
+                                        @*<img src="@Url.Content("~/img/user.png")">*@
+                                        <i class="fa-solid fa-circle-user fa-2x"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton" style="min-width: 11rem;">
+
+                            <li><h6 class="dropdown-header">User Roles</h6></li>
+
+                            <li><hr class="dropdown-divider"></li>
+
+                            @if (User != null)
+                            {
+                                @foreach (var c in _RazorTools.GetCurrentUserClaims()!)
+                                {
+                                    if (c.Type == ClaimTypes.Role)
+                                    {
+                                        string? selectedRole = _RazorTools.GetCurrentSession()?.GetKey<string>(AppConstants.SessionKey_SelectedRole);
+
+                                        string itemClass = (selectedRole == c.Value) ? ("active") : ("");
+                                        
+                                        <li><a class="dropdown-item @itemClass" href="@Url.Content("~/Home/SelectRole/")@c.Value"><i class="icon-mid bi bi-person me-2"></i> @c.Value </a></li>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <li><h6 class="dropdown-header">No roles available</h6></li>
+                            }
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="@Url.Content("~/Logout")"><i class="icon-mid bi bi-box-arrow-left me-2"></i> Logout</a></li>
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </nav>
+
+    </header>
+}

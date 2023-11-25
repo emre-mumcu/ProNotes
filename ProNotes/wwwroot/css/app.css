@@ -1,0 +1,31 @@
+html {
+  position: relative;
+  min-height: 100%;  
+}
+
+@media (min-width: 768px) {
+    html {
+        position: relative;
+        min-height: 100%;
+    }
+}
+
+/*
+::-webkit-input-placeholder {
+    color: silver !important;
+    font-size: small !important;
+    font-style: italic !important;
+}
+
+:-ms-input-placeholder { 
+    color: silver !important;
+    font-size: small !important;
+    font-style: italic !important;
+}
+
+::placeholder {
+    color: silver !important;
+    font-size: small !important;
+    font-style: italic !important;
+}
+    */

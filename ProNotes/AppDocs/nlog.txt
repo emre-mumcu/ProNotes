@@ -1,0 +1,9 @@
+﻿
+
+
+using NLog;
+using NLog.Web;
+
+private static Logger logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+
+logger.Warn($"The specified WebRootPath will be used as static files path.");

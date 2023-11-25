@@ -1,0 +1,23 @@
+﻿@page
+@model ProNotes.Pages.ReadMeModel
+
+@using Markdig
+
+@{
+    static string ReadMe()
+    {
+        // dotnet add package Markdig
+
+        var pipeline = new MarkdownPipelineBuilder()
+            .UseAdvancedExtensions()
+            .Build();
+
+        string readmeStr = System.IO.File.ReadAllText("readme.md");
+
+        return Markdown.ToHtml(readmeStr, pipeline);
+    }
+}
+
+<div class="m-2">
+    @Html.Raw(ReadMe())
+</div>

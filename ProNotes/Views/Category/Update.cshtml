@@ -1,0 +1,63 @@
+﻿@Html.PageTitle("Categories", null)
+
+@model CategoryUpdateVM
+
+<card title="Update Categories">
+
+    <form asp-controller="Category" asp-action="Update" method="get" id="FormGet">
+        <div class="mb-3 row">
+            <label class="col-sm-2 col-form-label">Existing Category</label>
+            <div class="col-sm-10">
+                <select asp-for="CategoryId" asp-items="Model.Categories" class="form-control" onchange="submit();">
+                    <option value="">-- Seçiniz --</option>
+                </select>
+            </div>
+        </div>
+    </form>
+
+    <hr />
+
+    <form asp-controller="Category" asp-action="Update" method="post">        
+
+        <div class="mb-3 row">
+            <label class="col-sm-2 col-form-label">Parent Category</label>
+            <div class="col-sm-10">
+                <select asp-for="ParentCategoryId" asp-items="Model.ParentCategories" class="form-control">
+                    <option value="">-- Seçiniz --</option>
+                </select>
+                <span asp-validation-for="ParentCategoryId" class="text-danger field-validation-valid"></span>
+            </div>
+        </div>
+
+        <div class="mb-3 row">
+            <label class="col-sm-2 col-form-label">Category Name</label>
+            <div class="col-sm-10">
+                <input class="form-control" asp-for="CategoryName" autocomplete="off">                
+                <input type="hidden" asp-for="CategoryId" value="@Model.CategoryId">                
+            </div>
+        </div>
+        
+        <div class="mb-3 row">
+            <label class="col-sm-2 col-form-label"></label>
+            <div class="col-sm-10">
+                @* <input type="submit" class="btn btn-primary" name="Command" value="Add"> *@
+                <input type="submit" class="btn btn-primary" name="Command" value="Update">
+            </div>
+        </div>
+
+    </form>
+
+</card>
+
+
+@section scriptSection {
+    <script>
+
+        function submit() {
+            $('#FormGet').submit();
+        }
+
+    </script>
+}
+
+

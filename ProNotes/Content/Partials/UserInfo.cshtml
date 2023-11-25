@@ -1,0 +1,43 @@
+﻿@{
+	System.Security.Claims.ClaimsIdentity ci = new System.Security.Claims.ClaimsIdentity();
+
+	if(User.Identity != null)
+	{
+		ci = ((System.Security.Claims.ClaimsIdentity)User.Identity);
+	}
+
+	string userClaimsJson = Newtonsoft.Json.JsonConvert.SerializeObject(ci,
+		Newtonsoft.Json.Formatting.Indented,
+		new Newtonsoft.Json.JsonSerializerSettings { ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore }
+	).Trim();
+}
+
+<div class="row small small">
+
+	<div class="col">
+
+		<div class="rounded-3">
+			<pre class="small">@userClaimsJson</pre>
+		</div>
+
+	</div>
+
+</div>
+
+@*<page>
+
+	<page-title>
+		@Html.PageTitle(pageTitle: "User Info", subTitle: "Current user information" )
+	</page-title>
+
+	<page-content>
+
+		<card title="Default Layout">			
+<xmp>					
+@Html.Raw(userClaimsJson)					
+</xmp>							
+		</card>
+	
+	</page-content>
+
+</page>*@

@@ -1,0 +1,47 @@
+﻿@using Microsoft.AspNetCore.Http
+@using Microsoft.Net.Http.Headers
+
+
+
+@{
+    string? domainUrl = string.Empty;
+
+    if (_HttpContextAccessor.HttpContext != null)
+    {
+        var scheme = _HttpContextAccessor.HttpContext.Request.Scheme;
+        var host = _HttpContextAccessor.HttpContext.Request.Headers[HeaderNames.Host];
+        domainUrl = scheme + "://" + host;        
+    }
+}
+
+
+<h4 class="my-2">Comming Soon...</h4>
+
+<p>
+    We are working hard to implement the Image Gallery feature as soon as possible. But no worries. This feature will be available to all our customers. Please be patient.
+</p>
+
+<i>While waiting, you can click the provided link to simulate what will happen if you use Image Gallery</i>
+
+<hr />
+
+<a href="javascript:mess();">Clik to select sample image</a>
+
+@section scriptSection {
+
+    <script>
+
+        function mess() {
+            window.parent.postMessage({
+                mceAction: 'insertContent', 
+                content: '<img src="@domainUrl/gallery/sample-image.jpg" alt="" />',
+            }, '*');
+
+            window.parent.postMessage({
+                mceAction: 'close'                
+            }, '*');
+        }
+
+    </script>
+
+}

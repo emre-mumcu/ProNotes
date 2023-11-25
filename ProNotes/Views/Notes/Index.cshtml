@@ -1,0 +1,43 @@
+﻿@using ProNotes.ViewModels
+
+@model List<NoteViewModel>?
+
+
+<card title="Notes">
+
+    @if (Model is not null && Model.Count > 0)
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Id</th>
+                    <th>Category Id</th>
+                    <th>Caption</th>
+                    <th>Abstract</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.Id</td>
+                        <td>@item.CategoryId</td>
+                        <td>@item.Caption</td>
+                        <td>@item.Abstract</td>
+                        <td>
+                            <a asp-action="ViewNote" asp-controller="Notes" asp-route-id="@item.Id" class="btn btn-primary">View</a>
+                            <a asp-action="Note" asp-controller="Notes" asp-route-id="@item.Id" class="btn btn-warning">Update</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot></tfoot>
+        </table>
+    }
+    else
+    {
+        <p>Not found!</p>
+    }
+
+</card>

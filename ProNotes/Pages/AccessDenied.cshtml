@@ -1,0 +1,21 @@
+﻿@page
+@using Newtonsoft.Json
+@model ProNotes.Pages.AccessDeniedModel
+@{ var returnUrl = HttpContext.Request.Query["returnurl"]; }
+
+Access Denied to @returnUrl
+
+@System.Text.Json.JsonSerializer.Serialize(User.Identity)
+
+<hr />
+
+<div style="width:350px;  overflow-wrap: break-word;
+    word-wrap: normal;
+    word-break: break-all;">
+<pre>
+    <code>
+@JsonConvert.SerializeObject(User.Identity as System.Security.Claims.ClaimsIdentity,
+    Formatting.None,
+    new JsonSerializerSettings() { ReferenceLoopHandling = ReferenceLoopHandling.Ignore })
+</code></pre>
+</div>

@@ -1,0 +1,74 @@
+﻿@using ProNotes.AppData.Entities;
+
+@model List<Category>
+
+@Html.PageTitle("Categories", null)
+
+<card title="Template Information">
+
+    @* @Html.ToTable(Model)  *@
+    <tablo items="Model"></tablo>
+
+
+@*     <div class="row">
+        <div class="col">
+            @{
+                //BuildMenu(Model);
+            }
+        </div>
+        <div class="col">
+            <figure>
+                <ul class="tree">
+                    <li>
+                        <code>Organizasyon Yapısı</code>
+                        @{
+                            //BuildMenu2(Model);
+                        }
+                    </li>
+                </ul>
+            </figure>
+        </div>
+    </div> *@
+
+</card>
+
+@functions {
+
+    private void BuildMenu(IEnumerable<Category> data, int? parentId = null)
+    {
+        var items = data.Where(d => d.ParentCategoryId == parentId).OrderBy(i => i.CategoryText);
+        if (items.Any())
+        {
+            <ul>
+                @foreach (var item in items)
+                {
+                    <li>
+                        <a href="#">@item.CategoryText</a>
+                        @{
+                            BuildMenu(data, item.CategoryId);
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    }
+
+    private void BuildMenu2(IEnumerable<Category> data, int? parentId = null)
+    {
+        var items = data.Where(d => d.ParentCategoryId == parentId).OrderBy(i => i.CategoryText);
+        if (items.Any())
+        {
+            <ul>
+                @foreach (var item in items)
+                {
+                    <li>
+                        <code><a href="#">@item.CategoryText</a></code>
+                        @{
+                            BuildMenu2(data, item.CategoryId);
+                        }
+                    </li>
+                }
+            </ul>
+        }
+    }
+}

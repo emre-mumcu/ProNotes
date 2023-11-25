@@ -1,0 +1,31 @@
+﻿@using System.IO
+@using Microsoft.AspNetCore.Hosting
+@inject IWebHostEnvironment webHostEnvironment
+
+<a class="nav-link dropdown-toggle text-body" href="#" data-bs-toggle="dropdown" role="button" aria-expanded="false">
+    <i class="fa-solid fa-palette"></i>
+</a>
+
+<ul class="dropdown-menu">
+
+    <li><h6 class="dropdown-header">Themes</h6></li>
+
+    @foreach (string s in GetBootswatch())
+    {
+        <li><a id="theme-@s" class="dropdown-item" href="" onclick="ChangeTheme(this.text)">@s</a></li>
+    }
+
+</ul>
+
+
+@functions {
+    public List<string> GetBootswatch()
+    {
+        var wwwroot = webHostEnvironment.WebRootPath;
+
+        List<DirectoryInfo> dirs = new DirectoryInfo(System.IO.Path.Combine(wwwroot, "css/bootswatch")).GetDirectories().ToList();
+        return dirs.Select(i => i.Name).ToList();
+    }
+}
+
+@*Current Theme: <script>document.write((localStorage.getItem('theme') == null) ? ("default") : (localStorage.getItem('theme')))</script>*@

@@ -1,0 +1,667 @@
+﻿@*
+In your TinyMCE plugins folder, look for the codesample folder. 
+In this you will fine plugin.js. Find line 1101, it displays the languages. Edit it as your needs:
+
+var languages = [
+    {text: 'C', value: 'c' },
+    {text: 'C#', value: 'csharp' },
+    {text: 'C++', value: 'cpp' },
+    {text: 'CSS', value: 'css' },
+    {text: 'F#', value: 'fsharp' },
+    {text: 'Java', value: 'java'},
+    {text: 'HTML/XML', value: 'markup'},
+    {text: 'JavaScript', value: 'javascript' },
+    {text: 'Json', value: 'json' },
+    {text: 'LESS', value: 'less' },
+    {text: 'PHP', value: 'php'},
+    {text: 'Python', value: 'python'},
+    {text: 'Ruby', value: 'ruby'},
+    {text: 'SASS', value: 'scss' },
+    {text: 'SQL', value: 'sql' },
+    {text: 'TypeScript', value: 'typescript' }
+];
+*@
+
+
+@model NoteViewModel
+
+@inject IHttpContextAccessor _httpContextAccessor
+
+@using Microsoft.Net.Http.Headers;
+@using Microsoft.AspNetCore.Http;
+@using ProNotes.ViewModels;
+
+@{
+    HttpContext? ctx = _httpContextAccessor.HttpContext;
+
+    if (ctx != null)
+    {
+        var scheme = ctx.Request.Scheme;
+        var host = ctx.Request.Headers[HeaderNames.Host];
+        var domainUrl = scheme + "://" + host;
+    }
+}
+
+<card title="@( (Model.Id==0?"New Note":Model.Caption)  )">
+
+    <form id="editorForm" name="editorForm" asp-controller="Notes" asp-action="Note" asp-antiforgery="true" method="post">
+
+        @Html.AntiForgeryToken()
+        @Html.ValidationSummary(excludePropertyErrors: false)
+        @Html.ValidationMessage("ERROR", new { @class = "text-danger" })
+
+        <input type="hidden" name="Id" value="@Model.Id" />
+
+        <div class="row">
+            <div class="col-sm-6">
+                <form-row title="Category">
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <select asp-for="CategoryId" asp-items="Model.Categories" class="form-control">
+                                <option value="">-- Select Category --</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger field-validation-valid"></span>
+                        </div>
+                        <div class="col-sm-6">
+                            <select asp-for="SubcategoryId" asp-items="Model.Subcategories" class="form-control">
+                                <option value="">-- Select Category --</option>
+                            </select>
+                            <span asp-validation-for="SubcategoryId" class="text-danger field-validation-valid"></span>
+                        </div>
+                    </div>
+                </form-row>
+            </div>
+            <div class="col-sm-6">
+                <form-row title="Tags">
+                    <input asp-for="Tags" class="form-control" placeholder="Comma seperated tags" />
+                </form-row>
+            </div>
+            <div class="col-sm-6">
+                <form-row title="Caption">
+                    <input asp-for="Caption" class="form-control" placeholder="Caption" />
+                </form-row>
+            </div>
+            <div class="col-sm-6">
+                <form-row title="Abstract">
+                    <input asp-for="Abstract" class="form-control" placeholder="Abstract" />
+                </form-row>
+            </div>
+        </div>
+
+        <div id="tinyEditor" name="tinyEditor">@Html.Raw(Model.Content)</div>
+
+        <input class="btn btn-primary mt-3" type="submit" value="Save" />
+
+    </form>
+
+</card>
+
+
+@section headSection {
+    @* 
+        _Styles.css e alındı
+    <link rel="stylesheet" href="@Url.Content("~/css/prism-material-light.css")" /> *@
+}
+
+
+    @section scriptSection {
+
+    <script>
+
+        $(document).ready(function () {
+
+            $('select[name="CategoryId"]').change(function () {
+
+                var selectedId = $('select[name=CategoryId] option').filter(':selected').val();
+
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Content("~/Notes/Subcategories")',
+                    data: {
+                        catid: selectedId,
+                    },
+                    success: function (data) {
+                        $('select[name="SubcategoryId"]').find('option').remove();
+                        $('select[name="SubcategoryId"]').append('<option value="">-- Seçiniz --</option>');
+                        $(data).each(
+                            function (index, item) {
+                                $('select[name="SubcategoryId"]').append('<option value="' + item.value + '">' + item.text + '</option>')
+                            });
+                    },
+                    error: function () {
+                    }
+                });
+
+
+            });
+
+        });
+
+    </script>
+
+    <script src="@Url.Content("~/js/prism.js")"></script>
+
+    <script src="@Url.Content("~/js/tinymce/tinymce.min.js")"></script>
+
+    <script>
+
+        var selectedTheme = localStorage.getItem('theme-dark-light') ?? "theme-light";
+
+        tinymce.init({
+
+            selector: 'div#tinyEditor',
+
+            width: '100%',
+
+            height: '550',
+
+            statusbar: true,
+
+            skin: (selectedTheme == "theme-light" ? "mumcusoft" : "oxide-dark"), // https://skin.tiny.cloud/t5/
+
+            content_css: (selectedTheme == "theme-light" ? "light" : "dark"),
+
+            inline: false,
+
+            language: "en", // tr is available
+
+            branding: true,
+
+            //schema: "html5",
+
+            //document_base_url: "",
+
+            //plugins: 'advlist anchor autolink autoresize autosave charmap code codesample colorpicker contextmenu directionality emoticons fullpage fullscreen help hr image imagetools importcss insertdatetime legacyoutput link lists media nonbreaking noneditable pagebreak paste preview print quickbars save searchreplace spellchecker tabfocus table template textcolor textpattern toc visualblocks visualchars wordcount',
+
+            plugins: 'advlist anchor autolink autosave charmap code codesample colorpicker contextmenu directionality emoticons fullscreen help hr image imagetools importcss insertdatetime legacyoutput link lists media nonbreaking noneditable pagebreak paste preview print save searchreplace spellchecker tabfocus table template textcolor textpattern toc visualblocks visualchars wordcount', // textpattern
+
+
+            // This configuration option allows a global Prism.js version to be used when highlighting code sample blocks, instead of using the Prism.js version bundled inside the codesample plugin. This allows for a custom version of Prism.js, including additional languages, to be used.
+            codesample_global_prismjs: true,
+
+            //codesample_languages: [
+            //    { text: 'HTML/XML', value: 'markup' },
+            //    { text: 'JavaScript', value: 'javascript' },
+            //    { text: 'CSS', value: 'css' },
+            //    { text: 'PHP', value: 'php' },
+            //    { text: 'Ruby', value: 'ruby' },
+            //    { text: 'Python', value: 'python' },
+            //    { text: 'Java', value: 'java' },
+            //    { text: 'C', value: 'c' },
+            //    { text: 'C#', value: 'csharp' },
+            //    { text: 'C++', value: 'cpp' }
+            //],
+
+            //textpattern_patterns: [
+            //    { start: '*', end: '*', format: 'italic' },
+            //    { start: '**', end: '**', format: 'bold' },
+            //    { start: '#', format: 'h1' },
+            //    { start: '##', format: 'h2' },
+            //    { start: '###', format: 'h3' },
+            //    { start: '####', format: 'h4' },
+            //    { start: '#####', format: 'h5' },
+            //    { start: '######', format: 'h6' },
+            //    { start: '1. ', cmd: 'InsertOrderedList' },
+            //    { start: '* ', cmd: 'InsertUnorderedList' },
+            //    { start: '- ', cmd: 'InsertUnorderedList' },
+            //    { start: '//brb', replacement: 'Be Right Back' }
+            //],
+
+            menubar: 'file edit insert view format table tools help',
+
+            toolbar: 'save cancel | CustomImageUpload gallery | undo redo | codesample formatselect | bold italic backcolor forecolor removeformat | selectall remove | alignleft aligncenter alignright alignjustify alignnone | outdent indent lineheight | ltr rtl | fullscreen',
+
+            contextmenu: 'link image table',
+
+            content_style: 'body { font-size:12px }',
+
+            contextmenu_never_use_native: true,
+
+            save_enablewhendirty: true,
+
+
+
+            setup: function (editor) {
+                EditorInit(editor);
+                CustomUploadImageButton(editor);
+                CustomUploadImageGalleryButton(editor);
+            },
+
+            init_instance_callback: function (editor) {
+                ExecCommand(editor);
+            },
+
+            save_oncancelcallback: CancelCallback,
+
+            file_picker_types: 'image', // 'file image media'
+
+            paste_data_images: true,
+
+            images_upload_handler: function (blobInfo, success, failure) {
+                UploadImage(blobInfo, success, failure);
+            },
+
+            relative_urls: false,
+
+            remove_script_host: false,
+
+            convert_urls: true,
+
+            block_unsupported_drop: false,
+
+            automatic_uploads: true,
+
+            images_reuse_filename: true,
+
+            images_file_types: 'jpeg,jpg,png,gif,webp', // Default Value: 'jpeg,jpg,jpe,jfi,jif,jfif,png,gif,bmp,webp'
+
+            image_advtab: true,
+
+            browser_spellcheck: true,
+        });
+
+        $(document).ready(function () {
+
+        });
+
+        function EditorInit(editor) {
+            editor.on('init', function (e) {
+                console.log('tinymce has been initialized');
+                // let content = tinymce.get('tinyEditor').getContent();
+                // let content = tinymce.activeEditor.getBody();
+                // tinymce.activeEditor.selection.select(tinymce.activeEditor.getBody(), true);
+                console.log('TinyMCE Version: ' + tinymce.majorVersion + '.' + tinymce.minorVersion);
+                tinymce.activeEditor.selection.getNode().scrollIntoView(false);
+                
+            });
+        }
+
+        function CancelCallback() {
+            Swal.fire({
+                title: 'Warning',
+                text: "If you continue, all unsaved data will be lost.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'OK',
+                cancelButtonText: 'Cancel',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    tinymce.activeEditor.resetContent();
+                }
+            })
+        }
+
+        function ExecCommand(editor) {
+            editor.on('ExecCommand', function (e) {
+                console.log(`${e.command} executed`);
+            });
+        }
+
+
+
+
+        function GetRequestVerificationToken() {
+            var form = $('#editorForm');
+            var token = $('input[name="__RequestVerificationToken"]', form).val();
+            return token;
+        }
+
+        function CustomUploadImageButton(editor) {
+            var fileInput = $('<input id="tinymce-uploader" type="file" name="pic" accept="image/*" style="display:none">');
+            $(editor.getElement()).parent().append(fileInput);
+            editor.ui.registry.addButton('CustomImageUpload', {
+                icon: 'image',
+                tooltip: 'Add local image',
+                onAction: function (_) {
+                    fileInput.trigger('click');
+                }
+            });
+            fileInput.on("change", function (e) {
+                CustomUploadImage($(this), editor);
+            });
+        }
+
+        function UploadImage(blobInfo, success, failure) {
+            var formData = new FormData();
+            formData.append('img', blobInfo.blob(), blobInfo.blob().name);
+            formData.append('__RequestVerificationToken', GetRequestVerificationToken());
+            var imageUploadUrl = '@Url.Content("~/tinymce/image")';
+            $.ajax({
+                url: imageUploadUrl,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data, textStatus, jqXHR) {
+                    success(data.location);
+                    console.log("image saved");
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.responseText) {
+                        errors = JSON.parse(jqXHR.responseText).errors;
+                        console.log(errors.join(", "));
+                        console.log(textStatus);
+                        console.log(errorThrown);
+                        editor.insertContent(errorThrown);
+                    }
+                }
+            });
+        }
+
+        function CustomUploadImage(inp, editor) {
+            var imageUploadUrl = '@Url.Content("~/tinymce/image")';
+            var input = inp.get(0).files[0];
+            var formData = new FormData();
+            formData.append('img', input, input.name);
+            formData.append('__RequestVerificationToken', GetRequestVerificationToken());
+            $.ajax({
+                url: imageUploadUrl,
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                success: function (data, textStatus, jqXHR) {
+                    editor.insertContent(`<img src='${data.location}' alt='' />`);
+                    $("#tinymce-uploader").val(null); // !important
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    editor.insertContent(errorThrown);
+                }
+            });
+        }
+
+        function CustomUploadImageGalleryButton(editor) {
+            editor.ui.registry.addButton('gallery', {
+                text: 'Gallery',
+                icon: 'gallery',
+                tooltip: 'Add image from gallery',
+                onAction: function (_) {
+                    $('#image').val('');
+                    tinyMCE.activeEditor.windowManager.openUrl({
+                        title: 'Image Gallery',
+                        url: '@Url.Content("~/ImageGallery/Index")',
+                        width: 800,
+                        height: 600,
+                        buttons: [
+                            {
+                                type: 'cancel',
+                                name: 'closeButton',
+                                text: 'Cancel'
+                            }
+                        ],
+                        onmessage: function (dialogApi, details) {
+                            console.log(dialogApi);
+                            console.log(details);
+                        }
+                    });
+                    //tinyMCE.activeEditor.windowManager.open({
+                    //    title: 'My Gallery',
+                    //    size: 'large',
+                    //    body: {
+                    //        type: 'panel', // The root body type - a Panel or TabPanel
+                    //        items: [ // A list of panel components
+                    //            {
+                    //                type: 'htmlpanel', // A HTML panel component
+                    //                html: '<div class="gallery-div"><input type="hidden" id="image"/>Your Gallery Items Html</div>'
+                    //            }
+                    //        ]
+                    //    },
+                    //    buttons: [
+                    //        {
+                    //            type: 'cancel',
+                    //            name: 'closeButton',
+                    //            text: 'Cancel'
+                    //        },
+                    //        {
+                    //            type: 'submit',
+                    //            name: 'submitButton',
+                    //            text: 'Insert To Editor',
+                    //            primary: true
+                    //        }
+                    //    ],
+                    //    onSubmit: function (api) {
+                    //        var data = api.getData();
+                    //        let source = $('#image').val();
+
+                    //        if (source != '') {
+                    //            editor.focus();
+                    //            editor.selection.setContent('<img src="' + source + '" />');
+                    //            api.close();
+                    //        } else {
+                    //            alert("Please select an image.");
+                    //        }
+                    //    }
+                    //});
+                }
+            });
+        }
+
+
+        $(document).on('click', '.gallery-div > .item', function () {
+            $('.gallery-div > .item').removeClass('active');
+            $(this).addClass('active');
+            $('#image').val($(this).find('img').attr('src'));
+        });
+
+    </script>
+}
+
+    @*
+tinymce.init({
+  selector: 'textarea#format-custom',
+  height: 500,
+  plugins: 'table wordcount',
+  content_style: '.left { text-align: left; } ' +
+    'img.left { float: left; } ' +
+    'table.left { float: left; } ' +
+    '.right { text-align: right; } ' +
+    'img.right { float: right; } ' +
+    'table.right { float: right; } ' +
+    '.center { text-align: center; } ' +
+    'img.center { display: block; margin: 0 auto; } ' +
+    'table.center { display: block; margin: 0 auto; } ' +
+    '.full { text-align: justify; } ' +
+    'img.full { display: block; margin: 0 auto; } ' +
+    'table.full { display: block; margin: 0 auto; } ' +
+    '.bold { font-weight: bold; } ' +
+    '.italic { font-style: italic; } ' +
+    '.underline { text-decoration: underline; } ' +
+    '.example1 {} ' +
+    'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }' +
+    '.tablerow1 { background-color: #D3D3D3; }',
+  formats: {
+    alignleft: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img,audio,video', classes: 'left' },
+    aligncenter: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img,audio,video', classes: 'center' },
+    alignright: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img,audio,video', classes: 'right' },
+    alignfull: { selector: 'p,h1,h2,h3,h4,h5,h6,td,th,div,ul,ol,li,table,img,audio,video', classes: 'full' },
+    bold: { inline: 'span', classes: 'bold' },
+    italic: { inline: 'span', classes: 'italic' },
+    underline: { inline: 'span', classes: 'underline', exact: true },
+    strikethrough: { inline: 'del' },
+    customformat: { inline: 'span', styles: { color: '#00ff00', fontSize: '20px' }, attributes: { title: 'My custom format'} , classes: 'example1'}
+  },
+  style_formats: [
+    { title: 'Custom format', format: 'customformat' },
+    { title: 'Align left', format: 'alignleft' },
+    { title: 'Align center', format: 'aligncenter' },
+    { title: 'Align right', format: 'alignright' },
+    { title: 'Align full', format: 'alignfull' },
+    { title: 'Bold text', inline: 'strong' },
+    { title: 'Red text', inline: 'span', styles: { color: '#ff0000' } },
+    { title: 'Red header', block: 'h1', styles: { color: '#ff0000' } },
+    { title: 'Badge', inline: 'span', styles: { display: 'inline-block', border: '1px solid #2276d2', 'border-radius': '5px', padding: '2px 5px', margin: '0 2px', color: '#2276d2' } },
+    { title: 'Table row 1', selector: 'tr', classes: 'tablerow1' },
+    { title: 'Image formats' },
+    { title: 'Image Left', selector: 'img', styles: { 'float': 'left', 'margin': '0 10px 0 10px' } },
+    { title: 'Image Right', selector: 'img', styles: { 'float': 'right', 'margin': '0 0 10px 10px' } },
+  ]
+});
+
+
+tinymce.init({
+  selector: 'textarea',
+  formats: {
+    // Changes the default format for h1 to have a class of heading
+    h1: { block: 'h1', classes: 'heading' }
+  },
+  style_formats: [
+    // Adds the h1 format defined above to style_formats
+    { title: 'My heading', format: 'h1' }
+  ]
+});
+
+
+tinymce.init({
+  selector: 'textarea',
+  style_formats: [
+    // Adds a h1 format to style_formats that applies a class of heading
+    { title: 'My heading', block: 'h1', classes: 'heading' }
+  ]
+});
+
+
+https://www.tiny.cloud/docs/configure/content-formatting/
+
+
+tinymce.init({
+    selector: 'textarea',
+    plugins: 'codesample',
+    codesample_languages: [
+        {text: 'HTML/XML', value: 'markup'},
+        {text: 'JavaScript', value: 'javascript'},
+        {text: 'CSS', value: 'css'},
+        {text: 'PHP', value: 'php'},
+        {text: 'Ruby', value: 'ruby'},
+        {text: 'Python', value: 'python'},
+        {text: 'Java', value: 'java'},
+        {text: 'C', value: 'c'},
+        {text: 'C#', value: 'csharp'},
+        {text: 'C++', value: 'cpp'}
+    ],
+    toolbar: 'codesample',
+    // Custom CSS file
+    codesample_content_css: "https://cdnjs.cloudflare.com/ajax/libs/prism/9000.0.1/themes/prism-dark.min.css",
+    // Custom dimensions
+    codesample_dialog_height: 400,
+    codesample_dialog_width: 600,
+    codesample_languages: [
+        {text:'HTML/XML',value:'markup'},
+        {text:"XML",value:"xml"},
+        {text:"HTML",value:"html"},
+        {text:"mathml",value:"mathml"},
+        {text:"SVG",value:"svg"},
+        {text:"CSS",value:"css"},
+        {text:"Clike",value:"clike"},
+        {text:"Javascript",value:"javascript"},
+        {text:"ActionScript",value:"actionscript"},
+        {text:"apacheconf",value:"apacheconf"},
+        {text:"apl",value:"apl"},
+        {text:"applescript",value:"applescript"},
+        {text:"asciidoc",value:"asciidoc"},
+        {text:"aspnet",value:"aspnet"},
+        {text:"autoit",value:"autoit"},
+        {text:"autohotkey",value:"autohotkey"},
+        {text:"bash",value:"bash"},
+        {text:"basic",value:"basic"},
+        {text:"batch",value:"batch"},
+        {text:"c",value:"c"},
+        {text:"brainfuck",value:"brainfuck"},
+        {text:"bro",value:"bro"},
+        {text:"bison",value:"bison"},
+        {text:"C#",value:"csharp"},
+        {text:"C++",value:"cpp"},
+        {text:"CoffeeScript",value:"coffeescript"},
+        {text:"ruby",value:"ruby"},
+        {text:"d",value:"d"},
+        {text:"dart",value:"dart"},
+        {text:"diff",value:"diff"},
+        {text:"docker",value:"docker"},
+        {text:"eiffel",value:"eiffel"},
+        {text:"elixir",value:"elixir"},
+        {text:"erlang",value:"erlang"},
+        {text:"fsharp",value:"fsharp"},
+        {text:"fortran",value:"fortran"},
+        {text:"git",value:"git"},
+        {text:"glsl",value:"glsl"},
+        {text:"go",value:"go"},
+        {text:"groovy",value:"groovy"},
+        {text:"haml",value:"haml"},
+        {text:"handlebars",value:"handlebars"},
+        {text:"haskell",value:"haskell"},
+        {text:"haxe",value:"haxe"},
+        {text:"http",value:"http"},
+        {text:"icon",value:"icon"},
+        {text:"inform7",value:"inform7"},
+        {text:"ini",value:"ini"},
+        {text:"j",value:"j"},
+        {text:"jade",value:"jade"},
+        {text:"java",value:"java"},
+        {text:"JSON",value:"json"},
+        {text:"jsonp",value:"jsonp"},
+        {text:"julia",value:"julia"},
+        {text:"keyman",value:"keyman"},
+        {text:"kotlin",value:"kotlin"},
+        {text:"latex",value:"latex"},
+        {text:"less",value:"less"},
+        {text:"lolcode",value:"lolcode"},
+        {text:"lua",value:"lua"},
+        {text:"makefile",value:"makefile"},
+        {text:"markdown",value:"markdown"},
+        {text:"matlab",value:"matlab"},
+        {text:"mel",value:"mel"},
+        {text:"mizar",value:"mizar"},
+        {text:"monkey",value:"monkey"},
+        {text:"nasm",value:"nasm"},
+        {text:"nginx",value:"nginx"},
+        {text:"nim",value:"nim"},
+        {text:"nix",value:"nix"},
+        {text:"nsis",value:"nsis"},
+        {text:"objectivec",value:"objectivec"},
+        {text:"ocaml",value:"ocaml"},
+        {text:"oz",value:"oz"},
+        {text:"parigp",value:"parigp"},
+        {text:"parser",value:"parser"},
+        {text:"pascal",value:"pascal"},
+        {text:"perl",value:"perl"},
+        {text:"PHP",value:"php"},
+        {text:"processing",value:"processing"},
+        {text:"prolog",value:"prolog"},
+        {text:"protobuf",value:"protobuf"},
+        {text:"puppet",value:"puppet"},
+        {text:"pure",value:"pure"},
+        {text:"python",value:"python"},
+        {text:"q",value:"q"},
+        {text:"qore",value:"qore"},
+        {text:"r",value:"r"},
+        {text:"jsx",value:"jsx"},
+        {text:"rest",value:"rest"},
+        {text:"rip",value:"rip"},
+        {text:"roboconf",value:"roboconf"},
+        {text:"crystal",value:"crystal"},
+        {text:"rust",value:"rust"},
+        {text:"sas",value:"sas"},
+        {text:"sass",value:"sass"},
+        {text:"scss",value:"scss"},
+        {text:"scala",value:"scala"},
+        {text:"scheme",value:"scheme"},
+        {text:"smalltalk",value:"smalltalk"},
+        {text:"smarty",value:"smarty"},
+        {text:"SQL",value:"sql"},
+        {text:"stylus",value:"stylus"},
+        {text:"swift",value:"swift"},
+        {text:"tcl",value:"tcl"},
+        {text:"textile",value:"textile"},
+        {text:"twig",value:"twig"},
+        {text:"TypeScript",value:"typescript"},
+        {text:"verilog",value:"verilog"},
+        {text:"vhdl",value:"vhdl"},
+        {text:"wiki",value:"wiki"},
+        {text:"YAML",value:"yaml"}
+    ]
+});
+
+
+https://ourcodeworld.com/articles/read/360/how-to-add-code-snippets-using-tinymce-and-prism-js
+
+
+*@

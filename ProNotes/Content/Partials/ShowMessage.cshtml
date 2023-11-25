@@ -1,0 +1,30 @@
+﻿@using Microsoft.AspNetCore.Http
+
+
+
+
+
+@*<script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>*@
+
+@{
+    string? message = _HttpContextAccessor?.HttpContext?.Session.GetKey<string>(AppConstants.SessionKey_System_Message);
+
+    if (!string.IsNullOrEmpty(message))
+    {
+        _HttpContextAccessor?.HttpContext?.Session.SetKey<string>(AppConstants.SessionKey_System_Message, string.Empty);
+        ShowMessage(message);
+    }
+}
+
+@functions {
+
+    public void ShowMessage(string message)
+    {
+        <script>
+            function ShowMessage(msg) {
+                Swal.fire({ title: 'Message', html: msg, icon: 'info', confirmButtonText: 'OK' });
+            }
+            ShowMessage('@message');
+        </script>
+    }
+}

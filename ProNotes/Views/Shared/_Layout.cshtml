@@ -1,0 +1,56 @@
+﻿<!DOCTYPE html>
+
+<html lang="tr">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="@Url.Content("~/")">
+    <title>[PR] Proje Notları @ViewBag.Title</title>
+    @await Html.PartialAsync("~/Content/Partials/_Styles.cshtml")
+    @await RenderSectionAsync("headSection", required: false)
+</head>
+
+<body style="font-family: 'Nunito', sans-serif;">
+
+    @*@Html.Preloader()*@
+
+    <div id="app">
+
+        <partial name="~/Content/Partials/Sidebar.cshtml" />
+
+        <div id="main" class='layout-navbar'>
+
+            <partial name="~/Content/Partials/Header.cshtml" />
+
+            <div id="main-content" class="pt-0 full-height">                
+
+                @RenderBody()
+
+                <partial name="~/Content/Partials/Footer.cshtml" />
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    @await Html.PartialAsync("~/Content/Partials/_Scripts.cshtml")
+
+    <partial name="~/Content/Partials/ShowMessage.cshtml" />
+
+    @await RenderSectionAsync("scriptSection", required: false)
+
+    <script>
+
+        $(document).ready(function () {
+
+        });
+
+    </script>
+
+</body>
+
+</html>

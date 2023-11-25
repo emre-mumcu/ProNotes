@@ -1,0 +1,149 @@
+﻿@using System.Reflection
+@using ProNotes.AppLib.MVC.Attributes
+
+@{
+	Assembly? asm = Assembly.GetAssembly(typeof(MenuItemAttribute));
+
+	var menu_items = asm?.GetTypes()
+		.Where(type => typeof(Microsoft.AspNetCore.Mvc.Controller).IsAssignableFrom(type))
+		.SelectMany(type => type.GetMethods(BindingFlags.Instance | BindingFlags.DeclaredOnly | BindingFlags.Public))
+		.Where(t => t.IsDefined(typeof(MenuItemAttribute)))
+		.Select(x => new
+		{
+			Controller = x?.DeclaringType.Name.Replace("Controller", null),
+			FullName = x?.DeclaringType.FullName,
+			Method = x?.Name,
+			MenuIndex = x?.GetCustomAttribute<MenuItemAttribute>()?.MenuIndex,
+			MenuDisplayName = x?.GetCustomAttribute<MenuItemAttribute>()?.MenuDisplayName,
+			MenuIconClass = x?.GetCustomAttribute<MenuItemAttribute>()?.MenuIconClass,
+			SubmenuIndex = x?.GetCustomAttribute<MenuItemAttribute>()?.SubmenuIndex,
+			SubmenuDisplayName = x?.GetCustomAttribute<MenuItemAttribute>()?.SubmenuDisplayName,			
+			SubmenuIconClass = x?.GetCustomAttribute<MenuItemAttribute>()?.SubmenuIconClass,
+			Link = x?.GetCustomAttribute<MenuItemAttribute>()?.Link
+		})
+		.OrderBy(x => x.MenuIndex)
+		.ThenBy(x=>x.Controller)
+		.ThenBy(x => x.SubmenuIndex)
+		.ThenBy(x => x.SubmenuDisplayName)
+		.ThenBy(x => x.Method)
+		.ToList();
+	;
+}
+
+<div id="sidebar" class="active">
+
+	<div class="sidebar-wrapper active">
+
+		<div class="sidebar-header ">
+
+			<div class="d-flex justify-content-between align-items-center">
+				<div class="logo">
+					<a href="#" target="_blank">Proje Notları</a>					
+				</div>				
+				<div class="toggler">
+					<a href="#" class="sidebar-hide d-xl-none d-block"><i class="bi bi-x bi-middle"></i></a>
+				</div>
+			</div>
+
+		</div>
+
+		<div class="sidebar-menu">
+
+			<ul class="menu">
+
+				<li class="sidebar-title"><h5>Menu</h5></li>
+
+				@if (!String.IsNullOrEmpty(_RazorTools.GetSessionKey<string>(AppConstants.SessionKey_SelectedRole)))
+				{
+					var secilenRol = _RazorTools.GetSessionKey<string>(AppConstants.SessionKey_SelectedRole);
+
+					@if (menu_items is not null)
+					{
+						@foreach (var item in menu_items.Select(p => new 
+						{
+							p?.Controller,
+							p?.FullName,
+							//p?.Method,
+							p?.MenuIndex,
+							p?.MenuDisplayName,
+							p?.MenuIconClass,
+							//p?.SubmenuIndex,
+							//p?.SubmenuDisplayName,
+							//p?.SubmenuIconClass,
+							//p?.Link
+						})
+								.OrderBy(x => x.MenuIndex)
+								.ThenBy(x => x.MenuDisplayName)
+								.Distinct())
+						{	// foreach body (each submenu item is parsed)
+
+							CustomAuthorizeAttribute? attr = Assembly
+								.GetAssembly(typeof(MenuItemAttribute))
+								.GetType(item?.FullName)
+								.GetCustomAttribute<CustomAuthorizeAttribute>();
+
+							if (attr is not null && (!attr.AllowedRoles.Split(',').Contains(secilenRol)))
+							{   // NOT allowed								
+								continue;
+							}
+
+							// Main Menu Item
+							<li class="sidebar-item has-sub @(_RazorTools.GetControllerName()==item.Controller ? "active":"")">
+
+								<a href="#" class="sidebar-link">
+									<i class="@item.MenuIconClass"></i>
+									<span>@(item.MenuDisplayName ?? item.Controller)</span>
+								</a>
+								
+								<ul class="submenu @(_RazorTools.GetControllerName()==item.Controller ? "active":"")">
+																		
+									@foreach (var sub_item in menu_items.Where(p => p.Controller == item.Controller).Select(p => new
+									{
+										p?.Method,
+										p?.SubmenuIndex,
+										p?.SubmenuDisplayName,
+										p?.SubmenuIconClass,
+										p?.Link
+									})
+											.OrderBy(x => x.SubmenuIndex)
+											.ThenBy(x => x.Method)
+											.Distinct())
+									{
+										// Submenu Item
+										<li class="submenu-item @(item.Controller==_RazorTools.GetControllerName() && _RazorTools.GetActionName()==sub_item.Method ? "active" : "")">
+											<a href="@(sub_item.Link ?? Url.Action(sub_item.Method, item.Controller))" class="nav-link @((item.Controller==_RazorTools.GetControllerName() && sub_item.Method==_RazorTools.GetActionName())?("active"):(""))">@sub_item.SubmenuDisplayName</a>
+										</li>
+									}
+
+								</ul>
+							</li>
+						}
+					}
+				}
+				else
+				{
+					<li>Please select a role</li>
+				}				
+
+			</ul>
+
+		</div>
+
+	</div>
+
+</div>
+
+@*  Menu Sample:
+	-----------_
+	<li class="sidebar-item has-sub">
+		<a href="#" class="sidebar-link">
+			<i class="fas fa-cog"></i>
+			<span>Settings</span>
+		</a>
+		<ul class="submenu">
+			<li id="home-userinfo" class="submenu-item">
+				<a href="@Url.Content("~/Settings/UserInfo")">User Info</a>
+			</li>
+		</ul>
+	</li>
+*@

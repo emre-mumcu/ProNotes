@@ -1,0 +1,18 @@
+﻿@model NoteViewModel
+
+<card title="@Model.Caption">
+
+    @Html.Raw(Model.Content)
+
+</card>
+
+@section headSection {
+    @* 
+        _Styles.css e alındı
+    <link rel="stylesheet" href="@Url.Content("~/css/prism-material-light.css")" /> 
+    *@
+}
+
+@section scriptSection {
+    <script src="@Url.Content("~/js/prism.js")"></script>
+}

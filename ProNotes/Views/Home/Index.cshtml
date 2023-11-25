@@ -1,0 +1,34 @@
+﻿@model String;
+
+@Html.PageTitle("Proje Notları","ProNotes Proje Notları")
+
+<card title="Merhaba">
+
+    <p>
+        Bağlı olduğunuz veri tabanı: @Model
+    </p>
+
+    <p class="d-inline-flex gap-1">
+        <button class="btn btn-primary" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample">
+            Readme
+        </button>
+    </p>
+    <div class="collapse" id="collapseExample" style="backdrop-filter: brightness(85%); padding:10px; ">
+
+        <p>
+            Although this is a responsive web template, it is not a design template. The design components used in the user interface were obtained from third party providers.
+        </p>
+
+        <p>
+            Selectable theme styles were directly taken from <a href="https://bootswatch.com/" target="_blank"> Bootswatch</a>. The styles and scripts have been taken as is, without any edit or modification.
+        </p>
+
+        <p>
+            Default light and dark themes were inspired by <a href="https://zuramai.github.io/mazer/" target="_blank">Mazer Template</a>. Only a small part (UI part) of the styles and scripts have been used and some changes have been made to these contents.
+        </p>
+
+        <p>At the time of the development of this template, both providers (Bootswatc & Mazer) were open source and free to use.</p>
+
+    </div>
+
+</card>
