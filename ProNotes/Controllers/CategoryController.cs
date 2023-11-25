@@ -73,7 +73,7 @@ namespace ProNotes.Controllers
             var q = _appDbContext.Categories.Update(category);
 
             
-
+            /*
             var states = new[] { EntityState.Added, EntityState.Modified, EntityState.Deleted };
             var entries = _appDbContext.ChangeTracker.Entries().Where(c => states.Contains(c.State))
                 .Select(entry =>
@@ -95,6 +95,7 @@ namespace ProNotes.Controllers
             var c1 = (_appDbContext.ChangeTracker.DebugView.LongView);
             _appDbContext.ChangeTracker.DetectChanges();
             var c2 = (_appDbContext.ChangeTracker.DebugView.LongView);
+            */
 
             _appDbContext.SaveChanges();
 

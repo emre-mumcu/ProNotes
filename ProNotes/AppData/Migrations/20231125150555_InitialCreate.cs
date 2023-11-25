@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -14,10 +15,10 @@ namespace ProNotes.AppData.Migrations
                 name: "Categories",
                 columns: table => new
                 {
-                    CategoryId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    CategoryText = table.Column<string>(type: "TEXT", nullable: true),
-                    ParentCategoryId = table.Column<int>(type: "INTEGER", nullable: true)
+                    CategoryId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    CategoryText = table.Column<string>(type: "longtext", nullable: true, collation: "latin5_turkish_ci"),
+                    ParentCategoryId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -27,24 +28,26 @@ namespace ProNotes.AppData.Migrations
                         column: x => x.ParentCategoryId,
                         principalTable: "Categories",
                         principalColumn: "CategoryId");
-                });
+                })
+                .Annotation("Relational:Collation", "latin5_turkish_ci");
 
             migrationBuilder.CreateTable(
                 name: "Notes",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    CategoryId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Caption = table.Column<string>(type: "TEXT", nullable: true),
-                    Abstract = table.Column<string>(type: "TEXT", nullable: true),
-                    Content = table.Column<string>(type: "TEXT", nullable: true),
-                    Tags = table.Column<string>(type: "TEXT", nullable: true)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    CategoryId = table.Column<int>(type: "int", nullable: false),
+                    Caption = table.Column<string>(type: "longtext", nullable: true, collation: "latin5_turkish_ci"),
+                    Abstract = table.Column<string>(type: "longtext", nullable: true, collation: "latin5_turkish_ci"),
+                    Content = table.Column<string>(type: "longtext", nullable: true, collation: "latin5_turkish_ci"),
+                    Tags = table.Column<string>(type: "longtext", nullable: true, collation: "latin5_turkish_ci")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Notes", x => x.Id);
-                });
+                })
+                .Annotation("Relational:Collation", "latin5_turkish_ci");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Categories_ParentCategoryId",

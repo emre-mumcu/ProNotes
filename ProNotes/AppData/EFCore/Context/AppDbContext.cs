@@ -4,6 +4,7 @@ using ProNotes.AppLib.Tools;
 using static NuGet.Packaging.PackagingConstants;
 
 // dotnet tool install --global dotnet-ef
+// dotnet tool update --global dotnet-ef
 // dotnet add package Microsoft.EntityFrameworkCore
 // dotnet add package Microsoft.EntityFrameworkCore.Design
 // dotnet add package Microsoft.EntityFrameworkCore.SqlServer
@@ -13,6 +14,17 @@ using static NuGet.Packaging.PackagingConstants;
 // dotnet ef database update
 
 // dotnet add package Pomelo.EntityFrameworkCore.MySql
+
+/*
+ * Raw SQL queries for unmapped types
+ * 
+ var summaries =
+    await context.Database.SqlQuery<PostSummary>(
+            @$"SELECT b.Name AS BlogName, p.Title AS PostTitle, p.PublishedOn
+            FROM Posts AS p
+            INNER JOIN Blogs AS b ON p.BlogId = b.Id")
+        .ToListAsync();
+ */
 
 namespace ProNotes.AppData.EFCore.Context
 {
@@ -83,10 +95,13 @@ namespace ProNotes.AppData.EFCore.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            // TODO To enable debugging in Migrations, uncomment following:
-            // if (System.Diagnostics.Debugger.IsAttached == false) System.Diagnostics.Debugger.Launch(); 
+			// TODO To enable debugging in Migrations, uncomment following:
+			// if (System.Diagnostics.Debugger.IsAttached == false) System.Diagnostics.Debugger.Launch(); 
 
-            modelBuilder.ApplyConfigurationsFromAssembly(System.Reflection.Assembly.GetExecutingAssembly());
-        }
+			modelBuilder.UseCollation("latin5_turkish_ci");
+			modelBuilder.ApplyConfigurationsFromAssembly(System.Reflection.Assembly.GetExecutingAssembly());
+
+			
+		}
     }
 }

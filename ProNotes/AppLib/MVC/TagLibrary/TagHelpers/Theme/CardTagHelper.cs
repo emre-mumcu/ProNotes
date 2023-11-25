@@ -19,7 +19,7 @@ namespace ProNotes.AppLib.MVC.TagLibrary.TagHelpers.Theme
             if (!string.IsNullOrEmpty(title))
             {
                 TagBuilder cardHeader = new TagBuilder("div");
-                cardHeader.AddCssClass("card-header");
+                cardHeader.AddCssClass("card-header pb-0");
                 cardHeader.InnerHtml.AppendHtml(@$"<h4 class=""card-title"">{title}</h4>");
                 output.PreContent.AppendHtml(cardHeader);
             }
