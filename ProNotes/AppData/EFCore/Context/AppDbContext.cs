@@ -12,6 +12,8 @@ using static NuGet.Packaging.PackagingConstants;
 // dotnet ef migrations add InitialCreate -o AppData/Migrations
 // dotnet ef database update
 
+// dotnet add package Pomelo.EntityFrameworkCore.MySql
+
 namespace ProNotes.AppData.EFCore.Context
 {
     public class AppDbContext : DbContext
@@ -62,9 +64,20 @@ namespace ProNotes.AppData.EFCore.Context
 
                 var connectionString = _Configuration.GetSection("Database").GetSection("ConnectionString").Value;
 
-                optionsBuilder.UseSqlite(connectionString);
-            }
-        }
+#if DEBUG
+				optionsBuilder
+	                .UseMySql(connectionString, new MySqlServerVersion(new Version(11, 2)))
+	                .LogTo(Console.WriteLine, LogLevel.Information)
+	                .EnableSensitiveDataLogging()
+	                .EnableDetailedErrors()
+                ;
+#else
+				optionsBuilder
+	                .UseMySql(connectionString, new MySqlServerVersion(new Version(11, 2)))
+                ;
+#endif
+			}
+		}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

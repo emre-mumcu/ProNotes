@@ -8,9 +8,7 @@
     }
   },
   "Database": {
-    // "Provider": "System.Data.SqlClient",
-    // "ConnectionString": "AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAAEwJh1LaiPUGpFV+r2sVxnBQAAAAYAAAAcwBlAGMAcgBlAHQAXwBkAGEAdABhAAAAA2YAAMAAAAAQAAAAufFE3CIHh5F/qC4llIyooAAAAAAEgAAAoAAAABAAAABF+YYJa8SkJ4hXEKpwAokpiAAAABrZQ2cZb/58w291vm11DjeGf8k/R4epPlHvP2A3AZGceBP9rH6MhzupS5QEXMK6vTNavhYSQk/3jQIO0sP/2DhwJCn+BghHWnQAaZI72RCSg4dAynl3XO4o814hvpQlMWc+EmSXtIaVsdIU+z/yMoFHJLvBLJ/CVrPT7VUuWyyFDTtW/y5CLj4UAAAALWqeDqGBQs12zaNHmAnZJAwtgwo=",
-    "Provider": "System.Data.SqlClient",
-    "ConnectionString": "Data Source=C:\\ProNotesData\\ProNotes.db"
+    "Provider": "Pomelo.EntityFrameworkCore.MySql",
+    "ConnectionString": "server=localhost;database=ProNotes;user=root;password=aA123456;"
   }
 }

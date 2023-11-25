@@ -11,7 +11,7 @@ using ProNotes.AppData.EFCore.Context;
 namespace ProNotes.AppData.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231009080638_InitialCreate")]
+    [Migration("20231125142930_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
