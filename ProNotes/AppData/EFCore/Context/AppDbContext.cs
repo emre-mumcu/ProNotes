@@ -3,6 +3,16 @@ using ProNotes.AppData.Entities;
 using ProNotes.AppLib.Tools;
 using static NuGet.Packaging.PackagingConstants;
 
+// mariabackup --backup --target-dir=c:\Tmp\MariaBackup --user=root --password=aA123456
+// mariabackup --prepare --target-dir=c:\Tmp\MariaBackup
+// First, stop the MariaDB Server process: net stop MariaDB Then, ensure that the datadir is empty.
+// mariabackup --copy-back --target-dir=c:\Tmp\MariaBackup
+// Then, you may need to fix the file permissions.
+// chown -R mysql:mysql /var/lib/mysql/
+
+// mariadb-dump db_name > backup-file.sql
+// mariadb db_name < backup-file.sql
+
 // dotnet tool install --global dotnet-ef
 // dotnet tool update --global dotnet-ef
 // dotnet add package Microsoft.EntityFrameworkCore
